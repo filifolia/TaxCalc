@@ -17,7 +17,7 @@ services:
       - 5432:5432
   migrate:
     image: api:latest
-    command: "./migration.sh"
+    command: bee migrate -driver=postgres -conn="postgres://postgres:password@postgres/tax-db?sslmode=disable"
     depends_on:
       - api
       - postgres

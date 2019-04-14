@@ -1,19 +1,24 @@
 package registration
 
-func init(){
+import (
+	"TaxCalc/models"
+	"fmt"
+	"time"
+
+	"github.com/astaxie/beego/orm"
+	_ "github.com/lib/pq"
+)
+
+func init() {
 	orm.RegisterDriver("postgres", orm.DRPostgres)
 
-	cfg := config.Config.PgCfg
-	connString := fmt.Sprintf("postgres://%s:%s@%s/%s?connect_timeout=%s&sslmode=disable", cfg.Username, cfg.Password, cfg.Host, cfg.Database, strconv.Itoa(cfg.Timeout))
-	log.Info("Connecting to ", connString)
+	connString := "postgres://postgres:password@postgres/tax-db?connect_timeout=3&sslmode=disable"
+	fmt.Println("Connecting to ", connString)
 
 	orm.DefaultTimeLoc = time.UTC
+	orm.Debug = true
 
-	if config.Environment == "dev" || config.Environment == "test" {
-		orm.Debug = true
-	}
+	orm.RegisterDataBase("default", "postgres", connString, 5, 5)
 
-	orm.RegisterDataBase("default", "postgres", connString, cfg.MaxIdleConn, cfg.MaxConn)
-
-	orm.RegisterModel(new(models.SalesOrder))
+	orm.RegisterModel(new(models.Item))
 }

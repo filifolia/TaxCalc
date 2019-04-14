@@ -1,4 +1,3 @@
-TaxCalc
 .DS_Store
 lastupdate.tmp
 logserver.txt
@@ -18,3 +17,4 @@ vendor/**/*.png
 vendor/**/*.zip
 vendor/**/*.pdf
 vendor/**/testdata/
+TaxCalc
