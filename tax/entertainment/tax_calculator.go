@@ -20,3 +20,7 @@ func (t *taxCalculator) Calculate(price float64) float64 {
 func (t *taxCalculator) IsRefundable() string {
 	return "No"
 }
+
+func (t *taxCalculator) GetType() string {
+	return "Entertainment"
+}

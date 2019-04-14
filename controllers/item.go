@@ -56,8 +56,15 @@ func (c *ItemController) Insert(params insertItemParams) *ErrorMessage {
 	return succMsg
 }
 
+type ListMessage struct {
+	Items         []*models.Item `json:"items"`
+	PriceSubtotal float64        `json:"price_subtotal"`
+	TaxSubtotal   float64        `json:"tax_subtotal"`
+	GrandTotal    float64        `json:"grand_total"`
+}
+
 // @router /get [get]
-func (c *ItemController) GetList() ([]*models.Item, *ErrorMessage) {
+func (c *ItemController) GetList() (*ListMessage, *ErrorMessage) {
 	items, err := c.itemOrmer.GetItems()
 	if err != nil {
 		errMsg := &ErrorMessage{Message: err.Error()}
@@ -69,6 +76,8 @@ func (c *ItemController) GetList() ([]*models.Item, *ErrorMessage) {
 	}
 
 	//Fill up the other tax item fields
+	var totalPrice float64
+	var totalTax float64
 	for _, item := range items {
 		taxCalc, err := c.registry.GetTaxCalculators(item.TaxCode)
 		if err != nil {
@@ -78,11 +87,21 @@ func (c *ItemController) GetList() ([]*models.Item, *ErrorMessage) {
 
 		item.Tax = taxCalc.Calculate(item.Price)
 		item.Refundable = taxCalc.IsRefundable()
+		item.Type = taxCalc.GetType()
 		item.Amount = item.Tax + item.Price
+		totalPrice += item.Price
+		totalTax += item.Tax
 	}
 
-	c.Data["json"] = items
+	var resp = &ListMessage{
+		Items:         items,
+		PriceSubtotal: totalPrice,
+		TaxSubtotal:   totalTax,
+		GrandTotal:    totalPrice + totalTax,
+	}
+
+	c.Data["json"] = resp
 	c.ServeJSON()
 
-	return items, nil
+	return resp, nil
 }

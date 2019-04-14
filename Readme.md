@@ -40,7 +40,7 @@ Input the db password "password" when prompted
 $ docker-compose exec api bee migrate -driver=postgres -conn="postgres://postgres:password@postgres/tax-db-test?sslmode=disable"
 
 # Unit test 
-Remove the "-e /models" tag if you want to include database models integration test as well
+Remove the "-e /models" and "-e tests" tag if you want to include database models integration test + end to end testing as well
 
 If you are in UNIX environment:
 $ docker-compose exec api env TAX_ENV=test go test -cover $(go list ./... | grep -v -e /vendor -e /database/migrations -e /models -e tests)

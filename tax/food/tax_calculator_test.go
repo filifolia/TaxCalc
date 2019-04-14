@@ -21,4 +21,9 @@ func TestTaxCalculator(t *testing.T) {
 		result := taxCalc.IsRefundable()
 		So(result, ShouldEqual, "Yes")
 	})
+
+	Convey("GetType", t, func() {
+		result := taxCalc.GetType()
+		So(result, ShouldEqual, "Food & Beverage")
+	})
 }
