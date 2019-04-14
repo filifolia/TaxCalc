@@ -6,9 +6,6 @@ build
 analytics_log
 *.log
 
-# duplicated comments router; Beego's bug
-*commentsRouter__*
-
 .idea/
 .vscode/
 

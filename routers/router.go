@@ -7,5 +7,12 @@ import (
 )
 
 func init() {
-	beego.Router("/item", &controllers.ItemController{})
+	ns := beego.NewNamespace("/v1",
+		beego.NSNamespace("/item",
+			beego.NSInclude(
+				&controllers.ItemController{},
+			),
+		),
+	)
+	beego.AddNamespace(ns)
 }

@@ -13,6 +13,6 @@ func (t *taxCalculator) Calculate(price float64) float64 {
 	return float64(10) + (price / 50)
 }
 
-func (t *taxCalculator) IsRefundable() bool {
-	return false
+func (t *taxCalculator) IsRefundable() string {
+	return "No"
 }
