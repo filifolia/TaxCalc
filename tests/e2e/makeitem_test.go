@@ -1,6 +1,7 @@
 package e2e_test
 
 import (
+	"TaxCalc/models"
 	_ "TaxCalc/models/registration"
 	"log"
 
@@ -12,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/astaxie/beego/orm"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -20,16 +20,16 @@ type ErrorMessage struct {
 	Message string `json:"message"`
 }
 
+type ListMessage struct {
+	Items         []*models.Item `json:"items"`
+	PriceSubtotal float64        `json:"price_subtotal"`
+	TaxSubtotal   float64        `json:"tax_subtotal"`
+	GrandTotal    float64        `json:"grand_total"`
+}
+
 //END TO END TEST by invoking http calls to the API itself
 func TestEndToEnd(t *testing.T) {
 	Convey("The API should be able to create two items and return them", t, func() {
-		ormer := orm.NewOrm()
-		//Reset the test DB first
-		_, err := ormer.Raw("TRUNCATE TABLE item CASCADE;").Exec()
-		if err != nil {
-			t.Error(err.Error())
-			t.FailNow()
-		}
 		var bodyReader io.Reader
 		var msg ErrorMessage
 		client := &http.Client{
@@ -39,7 +39,7 @@ func TestEndToEnd(t *testing.T) {
 		//////////////////First Item
 		body := `{
 			"tax_code" : 2,
-			"name" : "TEST",
+			"name" : "TEST1",
 			"price" : 100.5
 		}`
 		bodyReader = bytes.NewReader([]byte(body))
@@ -58,9 +58,8 @@ func TestEndToEnd(t *testing.T) {
 
 		err = json.Unmarshal(respBytes, &msg)
 		So(err, ShouldBeNil)
-		So(msg.Message, ShouldEqual, "")
 
-		/////////////////Second Item
+		///////////////Second Item
 		body = `{
 			"tax_code" : 1,
 			"name" : "TEST2",
@@ -82,7 +81,23 @@ func TestEndToEnd(t *testing.T) {
 
 		err = json.Unmarshal(respBytes, &msg)
 		So(err, ShouldBeNil)
-		So(msg.Message, ShouldEqual, "")
+
+		///////////////Get Item List
+		var listMsg ListMessage
+		req, err = http.NewRequest("GET", "http://api:8080/v1/item/get", nil)
+		So(err, ShouldBeNil)
+
+		resp, err = client.Do(req)
+		So(err, ShouldBeNil)
+
+		respBytes, err = ioutil.ReadAll(resp.Body)
+		So(err, ShouldBeNil)
+
+		log.Printf("RESPONSE: %s", string(respBytes))
+		resp.Body.Close()
+
+		err = json.Unmarshal(respBytes, &listMsg)
+		So(err, ShouldBeNil)
 
 	})
 
