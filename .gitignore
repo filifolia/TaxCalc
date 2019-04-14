@@ -1,0 +1,20 @@
+TaxCalc
+.DS_Store
+lastupdate.tmp
+logserver.txt
+TaxCalc.exe*
+build
+analytics_log
+*.log
+
+# duplicated comments router; Beego's bug
+*commentsRouter__*
+
+.idea/
+.vscode/
+
+vendor/**/*_test.go
+vendor/**/*.png
+vendor/**/*.zip
+vendor/**/*.pdf
+vendor/**/testdata/
