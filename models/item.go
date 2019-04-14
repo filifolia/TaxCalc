@@ -50,7 +50,7 @@ func (i *itemOrmer) Create(item *Item) error {
 
 func (i *itemOrmer) GetItems() ([]*Item, error) {
 	var items []*Item
-	_, err := i.ormer.QueryTable("item").Limit(-1).All(&items)
+	_, err := i.ormer.QueryTable("item").Limit(-1).OrderBy("name").All(&items)
 	if err != nil {
 		return nil, err
 	}

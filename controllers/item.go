@@ -21,6 +21,10 @@ func (c *ItemController) Prepare() {
 	c.itemOrmer = models.NewItemOrmer(ormer)
 }
 
+type ErrorMessage struct {
+	Message string `json:"message"`
+}
+
 type insertItemParams struct {
 	Name    string  `json:"name"`
 	TaxCode int     `json:"tax_code"`
@@ -29,7 +33,7 @@ type insertItemParams struct {
 
 // @Param  params          body   {insertItemParams} true "params"
 // @router /insert [post]
-func (c *ItemController) Insert(params insertItemParams) error {
+func (c *ItemController) Insert(params insertItemParams) *ErrorMessage {
 	newItem := &models.Item{
 		Name:    params.Name,
 		Price:   params.Price,
@@ -38,17 +42,30 @@ func (c *ItemController) Insert(params insertItemParams) error {
 
 	err := c.itemOrmer.Create(newItem)
 	if err != nil {
-		return err
+		errMsg := &ErrorMessage{Message: err.Error()}
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = errMsg
+		c.ServeJSON()
+
+		return errMsg
 	}
 
-	return nil
+	succMsg := &ErrorMessage{Message: ""}
+	c.Data["json"] = succMsg
+	c.ServeJSON()
+	return succMsg
 }
 
 // @router /get [get]
-func (c *ItemController) GetList() ([]*models.Item, error) {
+func (c *ItemController) GetList() ([]*models.Item, *ErrorMessage) {
 	items, err := c.itemOrmer.GetItems()
 	if err != nil {
-		return nil, err
+		errMsg := &ErrorMessage{Message: err.Error()}
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = errMsg
+		c.ServeJSON()
+
+		return nil, errMsg
 	}
 
 	//Fill up the other tax item fields
